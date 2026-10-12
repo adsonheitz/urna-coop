@@ -265,40 +265,40 @@
         {
           numero: '2222',
           nome: 'João Emanuel',
-          partido: 'Partido Divertido das Crianças 22',
-          foto: '2222 - João Emanuel.png'
+          partido: 'Partido Divertido das Crianças',
+          foto: '2222_-_Joao_Emanuel.png'
         },
         {
           numero: '2223',
           nome: 'Estêvão',
-          partido: 'Partido Divertido das Crianças 22',
-          foto: '2223 - Estêvão.png'
+          partido: 'Partido Divertido das Crianças',
+          foto: '2223_-_Estevao.png'
         },
         {
           numero: '1211',
           nome: 'Cecília Aguiar',
-          partido: 'Partido da Cooperação 12',
-          foto: '1211 - Cecília Aguiar.png'
+          partido: 'Partido da Cooperação',
+          foto: '1211_-_Cecilia_Aguiar.png'
         },
         {
           numero: '1210',
           nome: 'Sophia',
-          partido: 'Partido da Cooperação 12',
-          foto: '1210 - Sophia.png'
+          partido: 'Partido da Cooperação',
+          foto: '1210_-_Sophia.png'
         }
       ],
       presidente: [
         {
           numero: '22',
           nome: 'Joaquim',
-          partido: 'Partido Divertido das Crianças 22',
-          foto: '22 - Joaquim.png'
+          partido: 'Partido Divertido das Crianças',
+          foto: '22_-_Joaquim.png'
         },
         {
           numero: '12',
           nome: 'Lívia',
-          partido: 'Partido da Cooperação 12',
-          foto: '12 - Lívia.png'
+          partido: 'Partido da Cooperação',
+          foto: '12_-_Livia.png'
         }
       ]
     };
@@ -320,6 +320,7 @@
 
     // --- REPRODUTORES DE ÁUDIO MP3 LOCAIS ---
     const somTecla = new Audio('tecla.mp3');
+    const somConfirma = new Audio('confirma.mp3');
     const somFim = new Audio('fim.mp3');
 
     // Função de ativação exigida pelo Android
@@ -329,6 +330,11 @@
         somTecla.currentTime = 0;
       }).catch(() => {});
       
+      somConfirma.play().then(() => {
+        somConfirma.pause();
+        somConfirma.currentTime = 0;
+      }).catch(() => {});
+
       somFim.play().then(() => {
         somFim.pause();
         somFim.currentTime = 0;
@@ -344,6 +350,15 @@
         somTecla.play().catch(e => console.log("Áudio bloqueado", e));
       } catch (e) {
         console.error("Erro ao reproduzir som de tecla", e);
+      }
+    }
+
+    function tocarSomConfirma() {
+      try {
+        somConfirma.currentTime = 0;
+        somConfirma.play().catch(e => console.log("Áudio bloqueado", e));
+      } catch (e) {
+        console.error("Erro ao reproduzir som de confirmação", e);
       }
     }
 
@@ -506,10 +521,17 @@
       }
 
       if (votoValido) {
+        // Toca o som confirma.mp3 exclusivamente ao confirmar o cargo de deputado
+        if (etapa.cargo === 'deputado') {
+          tocarSomConfirma();
+        }
+
         etapaAtual++;
 
         if (etapaAtual < ETAPAS.length) {
-          tocarSomTecla();
+          if (etapa.cargo !== 'deputado') {
+            tocarSomTecla();
+          }
           iniciarEtapa();
         } else {
           tocarSomFim();
