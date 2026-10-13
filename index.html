@@ -745,7 +745,6 @@
         }
 
         if (votoValido) {
-          // Toca o som confirma.mp3 exclusivamente ao confirmar o cargo de deputado
           if (etapa.cargo === "deputado") {
             tocarSomConfirma();
           }
@@ -819,19 +818,23 @@
         containerPres.innerHTML = gerarHtmlCargo("presidente");
       }
 
-      // FUNÇÃO QUE CALCULA E EXIBE OS MAIS VOTADOS (COM CRITÉRIO DE DESEMPATE: MAIS VELHO)
+      // --- FUNÇÃO QUE CALCULA E EXIBE OS DOIS DEPUTADOS MAIS VOTADOS E O PRESIDENTE ---
       function renderizarEleitos() {
         const containerEleitos = document.getElementById("relatorio-eleitos");
 
-        const deputadoEleito = obterMaisVotado("deputado");
+        const deputadosEleitos = obterDoisMaisVotados("deputado");
         const presidenteEleito = obterMaisVotado("presidente");
 
         let html = "";
-        html += criarCardEleito(
-          "Deputado Eleito",
-          deputadoEleito,
-          "text-amber-400",
-        );
+
+        deputadosEleitos.forEach((deputado, index) => {
+          html += criarCardEleito(
+            `Deputado Eleito (${index + 1}º Lugar)`,
+            deputado,
+            "text-amber-400",
+          );
+        });
+
         html += criarCardEleito(
           "Presidente Eleito",
           presidenteEleito,
@@ -841,45 +844,35 @@
         containerEleitos.innerHTML = html;
       }
 
-      function obterMaisVotado(cargo) {
+      // Retorna os DOIS mais votados de um cargo (com critério de desempate por idade)
+      function obterDoisMaisVotados(cargo) {
         const lista = CANDIDATOS[cargo];
         const votosCargo = votosArmazenados[cargo] || {};
 
-        let maisVotado = null;
-        let maiorVotos = -1;
+        let candidatosComVotos = lista.map((c) => ({
+          nome: c.nome,
+          partido: c.partido,
+          numero: c.numero,
+          foto: c.foto,
+          nascimento: c.nascimento,
+          votos: votosCargo[c.numero] || 0,
+        }));
 
-        lista.forEach((c) => {
-          const qtd = votosCargo[c.numero] || 0;
-
-          if (qtd > maiorVotos) {
-            // Se tem mais votos do que o atual líder, assume a liderança
-            maiorVotos = qtd;
-            maisVotado = {
-              nome: c.nome,
-              partido: c.partido,
-              numero: c.numero,
-              foto: c.foto,
-              nascimento: c.nascimento,
-              votos: qtd,
-            };
-          } else if (qtd === maiorVotos && maiorVotos > 0) {
-            // EMPATE NA QUANTIDADE DE VOTOS: Critério de desempate = Data de nascimento (o mais velho tem data anterior)
-            if (c.nascimento < maisVotado.nascimento) {
-              maisVotado = {
-                nome: c.nome,
-                partido: c.partido,
-                numero: c.numero,
-                foto: c.foto,
-                nascimento: c.nascimento,
-                votos: qtd,
-              };
-            }
+        candidatosComVotos.sort((a, b) => {
+          if (b.votos !== a.votos) {
+            return b.votos - a.votos;
           }
+          return a.nascimento.localeCompare(b.nascimento);
         });
 
-        // Se ninguém recebeu votos, exibe o primeiro candidato da lista como referência mas com 0 votos
-        if (!maisVotado || maiorVotos === 0) {
-          const primeiro = lista[0];
+        return candidatosComVotos.slice(0, 2);
+      }
+
+      // Mantém a função compatível para cargos de um único vencedor (Presidente)
+      function obterMaisVotado(cargo) {
+        const doisMais = obterDoisMaisVotados(cargo);
+        if (!doisMais.length || doisMais[0].votos === 0) {
+          const primeiro = CANDIDATOS[cargo][0];
           return {
             nome: primeiro.nome,
             partido: "Aguardando votos",
@@ -888,8 +881,7 @@
             foto: primeiro.foto,
           };
         }
-
-        return maisVotado;
+        return doisMais[0];
       }
 
       function criarCardEleito(tituloCargo, candidato, corTexto) {
