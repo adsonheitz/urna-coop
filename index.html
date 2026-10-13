@@ -1,681 +1,899 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Simulador de Urna Eletrônica - Cooperativa Educando com Propósito</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;700;900&display=swap');
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>
+      Simulador de Urna Eletrônica - Cooperativa Educando com Propósito
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;700;900&display=swap");
 
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #1e293b;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
-    }
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #1e293b;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+      }
 
-    /* Display digital LCD simulado */
-    .lcd-screen {
-      background-color: #d1fae5;
-      font-family: 'Roboto', sans-serif;
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-    }
+      /* Display digital LCD simulado */
+      .lcd-screen {
+        background-color: #d1fae5;
+        font-family: "Roboto", sans-serif;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+      }
 
-    .digit-box {
-      border: 2px solid #334155;
-      width: 34px;
-      height: 44px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: bold;
-      background-color: #ffffff;
-      color: #0f172a;
-    }
+      .digit-box {
+        border: 2px solid #334155;
+        width: 34px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        background-color: #ffffff;
+        color: #0f172a;
+      }
 
-    .digit-box.active {
-      animation: blink 1s infinite;
-      border-color: #0284c7;
-    }
+      .digit-box.active {
+        animation: blink 1s infinite;
+        border-color: #0284c7;
+      }
 
-    @keyframes blink {
-      0%, 100% { border-color: #0284c7; background-color: #e0f2fe; }
-      50% { border-color: #94a3b8; background-color: #ffffff; }
-    }
+      @keyframes blink {
+        0%,
+        100% {
+          border-color: #0284c7;
+          background-color: #e0f2fe;
+        }
+        50% {
+          border-color: #94a3b8;
+          background-color: #ffffff;
+        }
+      }
 
-    /* Teclado Físico da Urna */
-    .btn-key {
-      background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-      color: #ffffff;
-      box-shadow: 0 4px 0 #000, 0 5px 10px rgba(0,0,0,0.5);
-      transition: all 0.05s ease;
-    }
+      /* Teclado Físico da Urna */
+      .btn-key {
+        background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+        color: #ffffff;
+        box-shadow:
+          0 4px 0 #000,
+          0 5px 10px rgba(0, 0, 0, 0.5);
+        transition: all 0.05s ease;
+      }
 
-    .btn-key:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #000, 0 2px 5px rgba(0,0,0,0.5);
-    }
+      .btn-key:active {
+        transform: translateY(3px);
+        box-shadow:
+          0 1px 0 #000,
+          0 2px 5px rgba(0, 0, 0, 0.5);
+      }
 
-    .btn-branco {
-      background: linear-gradient(145deg, #ffffff, #e2e8f0);
-      color: #000000;
-      box-shadow: 0 4px 0 #94a3b8, 0 5px 10px rgba(0,0,0,0.3);
-    }
-    .btn-branco:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #94a3b8;
-    }
+      .btn-branco {
+        background: linear-gradient(145deg, #ffffff, #e2e8f0);
+        color: #000000;
+        box-shadow:
+          0 4px 0 #94a3b8,
+          0 5px 10px rgba(0, 0, 0, 0.3);
+      }
+      .btn-branco:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 #94a3b8;
+      }
 
-    .btn-corrige {
-      background: linear-gradient(145deg, #f97316, #ea580c);
-      color: #ffffff;
-      box-shadow: 0 4px 0 #c2410c, 0 5px 10px rgba(0,0,0,0.3);
-    }
-    .btn-corrige:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #c2410c;
-    }
+      .btn-corrige {
+        background: linear-gradient(145deg, #f97316, #ea580c);
+        color: #ffffff;
+        box-shadow:
+          0 4px 0 #c2410c,
+          0 5px 10px rgba(0, 0, 0, 0.3);
+      }
+      .btn-corrige:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 #c2410c;
+      }
 
-    .btn-confirma {
-      background: linear-gradient(145deg, #22c55e, #16a34a);
-      color: #ffffff;
-      box-shadow: 0 4px 0 #15803d, 0 5px 10px rgba(0,0,0,0.3);
-    }
-    .btn-confirma:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #15803d;
-    }
+      .btn-confirma {
+        background: linear-gradient(145deg, #22c55e, #16a34a);
+        color: #ffffff;
+        box-shadow:
+          0 4px 0 #15803d,
+          0 5px 10px rgba(0, 0, 0, 0.3);
+      }
+      .btn-confirma:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 #15803d;
+      }
 
-    .pisca-texto {
-      animation: blinkText 1.2s infinite;
-    }
+      .pisca-texto {
+        animation: blinkText 1.2s infinite;
+      }
 
-    @keyframes blinkText {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col items-center justify-between p-2 text-slate-100">
-
-  <!-- CAPA DE DESBLOQUEIO DE ÁUDIO PARA ANDROID -->
-  <div id="overlay-inicio" onclick="liberarAudioAndroid()" class="fixed inset-0 bg-slate-950/90 z-50 flex flex-col items-center justify-center p-6 text-center">
-    <div class="bg-slate-800 border-2 border-emerald-500 p-6 rounded-2xl shadow-2xl max-w-sm">
-      <div class="text-4xl mb-3">🗳️</div>
-      <h2 class="text-xl font-bold text-white mb-2">Simulador de Urna</h2>
-      <p class="text-slate-300 text-sm mb-4">Toque no botão abaixo para iniciar a votação e habilitar o som no celular.</p>
-      <button class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition text-base">
-        INICIAR VOTAÇÃO
-      </button>
-    </div>
-  </div>
-
-  <header class="w-full max-w-4xl my-2 flex justify-between items-center bg-slate-800 p-3 rounded-xl border border-slate-700 shadow-lg">
-    <div class="flex items-center space-x-2">
-      <div class="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-900 text-sm">
-        ✓
+      @keyframes blinkText {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen flex flex-col items-center justify-between p-2 text-slate-100"
+  >
+    <!-- CAPA DE DESBLOQUEIO DE ÁUDIO PARA ANDROID -->
+    <div
+      id="overlay-inicio"
+      onclick="liberarAudioAndroid()"
+      class="fixed inset-0 bg-slate-950/90 z-50 flex flex-col items-center justify-center p-6 text-center"
+    >
+      <div
+        class="bg-slate-800 border-2 border-emerald-500 p-6 rounded-2xl shadow-2xl max-w-sm"
+      >
+        <div class="text-4xl mb-3">🗳️</div>
+        <h2 class="text-xl font-bold text-white mb-2">Simulador de Urna</h2>
+        <p class="text-slate-300 text-sm mb-4">
+          Toque no botão abaixo para iniciar a votação e habilitar o som no
+          celular.
+        </p>
+        <button
+          class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition text-base"
+        >
+          INICIAR VOTAÇÃO
+        </button>
       </div>
-      <h1 class="text-sm sm:text-lg font-bold text-white tracking-wide">Eleição Escolar</h1>
     </div>
-    <div class="flex space-x-2">
-      <button onclick="alternarTelaCheia()" id="btn-fullscreen" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg text-xs transition shadow flex items-center gap-1">
-        ⛶ Tela Cheia
-      </button>
-      <button onclick="abrirApuracao()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg text-xs transition shadow flex items-center gap-1">
-        📊 Relatório
-      </button>
-    </div>
-  </header>
 
-  <main class="w-full max-w-4xl bg-slate-200 text-slate-900 rounded-2xl p-3 sm:p-6 shadow-2xl border-4 border-slate-300 flex flex-col md:flex-row gap-4 items-stretch my-auto">
-    
-    <!-- TELA DA URNA (LCD) -->
-    <section class="flex-1 lcd-screen rounded-lg border-4 border-slate-400 p-3 sm:p-5 flex flex-col justify-between min-h-[350px] relative overflow-hidden">
-      
-      <!-- Conteúdo Normal de Votação -->
-      <div id="tela-votacao" class="h-full flex flex-col justify-between">
-        
-        <!-- Cabeçalho do Voto -->
-        <div>
-          <div class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" id="cargo-titulo">
-            SEU VOTO VAI PARA
-          </div>
-          <div class="text-lg sm:text-2xl font-black text-slate-900 uppercase tracking-wide" id="cargo-nome">
-            DEPUTADO
-          </div>
+    <header
+      class="w-full max-w-4xl my-2 flex justify-between items-center bg-slate-800 p-3 rounded-xl border border-slate-700 shadow-lg"
+    >
+      <div class="flex items-center space-x-2">
+        <div
+          class="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-900 text-sm"
+        >
+          ✓
         </div>
+        <h1 class="text-sm sm:text-lg font-bold text-white tracking-wide">
+          Eleição Escolar
+        </h1>
+      </div>
+      <div class="flex space-x-2">
+        <button
+          onclick="alternarTelaCheia()"
+          id="btn-fullscreen"
+          class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg text-xs transition shadow flex items-center gap-1"
+        >
+          ⛶ Tela Cheia
+        </button>
+        <button
+          onclick="abrirApuracao()"
+          class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg text-xs transition shadow flex items-center gap-1"
+        >
+          📊 Relatório
+        </button>
+      </div>
+    </header>
 
-        <!-- Centro: Digitação e Informações do Candidato -->
-        <div class="my-2 flex justify-between items-start gap-3">
-          <div class="flex-1">
-            
-            <!-- Campo de Números -->
-            <div class="flex items-center gap-2 mb-3">
-              <span class="text-xs sm:text-sm font-bold text-slate-700">Número:</span>
-              <div id="caixa-numeros" class="flex gap-1">
-                <!-- Quadrados de dígitos inseridos dinamicamente -->
+    <main
+      class="w-full max-w-4xl bg-slate-200 text-slate-900 rounded-2xl p-3 sm:p-6 shadow-2xl border-4 border-slate-300 flex flex-col md:flex-row gap-4 items-stretch my-auto"
+    >
+      <!-- TELA DA URNA (LCD) -->
+      <section
+        class="flex-1 lcd-screen rounded-lg border-4 border-slate-400 p-3 sm:p-5 flex flex-col justify-between min-h-[350px] relative overflow-hidden"
+      >
+        <!-- Conteúdo Normal de Votação -->
+        <div id="tela-votacao" class="h-full flex flex-col justify-between">
+          <!-- Cabeçalho do Voto -->
+          <div>
+            <div
+              class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1"
+              id="cargo-titulo"
+            >
+              SEU VOTO VAI PARA
+            </div>
+            <div
+              class="text-lg sm:text-2xl font-black text-slate-900 uppercase tracking-wide"
+              id="cargo-nome"
+            >
+              DEPUTADO
+            </div>
+          </div>
+
+          <!-- Centro: Digitação e Informações do Candidato -->
+          <div class="my-2 flex justify-between items-start gap-3">
+            <div class="flex-1">
+              <!-- Campo de Números -->
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-xs sm:text-sm font-bold text-slate-700"
+                  >Número:</span
+                >
+                <div id="caixa-numeros" class="flex gap-1">
+                  <!-- Quadrados de dígitos inseridos dinamicamente -->
+                </div>
+              </div>
+
+              <!-- Dados do Candidato / Estado -->
+              <div
+                id="dados-candidato"
+                class="space-y-1 text-slate-800 text-xs sm:text-base"
+              >
+                <!-- Preenchido via Javascript -->
               </div>
             </div>
 
-            <!-- Dados do Candidato / Estado -->
-            <div id="dados-candidato" class="space-y-1 text-slate-800 text-xs sm:text-base">
+            <!-- Foto do Candidato -->
+            <div
+              id="painel-foto"
+              class="hidden flex-col items-center bg-white p-1 rounded border-2 border-slate-400 shadow-sm w-28 sm:w-36"
+            >
+              <img
+                id="foto-candidato"
+                src=""
+                alt="Candidato"
+                class="w-full h-32 sm:h-40 object-cover rounded"
+              />
+              <span
+                id="rotulo-foto"
+                class="text-[10px] sm:text-xs font-bold text-slate-700 mt-1 uppercase text-center"
+                >Presidente</span
+              >
+            </div>
+          </div>
+
+          <!-- Rodapé de Instruções da Tela -->
+          <div
+            class="border-t-2 border-slate-400 pt-2 text-[10px] sm:text-xs text-slate-700"
+          >
+            <div>Aperte a tecla:</div>
+            <div class="ml-1 font-semibold">
+              VERDE / CONFIRMA para CONFIRMAR este voto
+            </div>
+            <div class="ml-1 font-semibold">
+              LARANJA / CORRIGE para REINICIAR este voto
+            </div>
+          </div>
+        </div>
+
+        <!-- Tela Final de FIM -->
+        <div
+          id="tela-fim"
+          class="hidden absolute inset-0 bg-emerald-100 flex-col items-center justify-center text-center p-4"
+        >
+          <h2
+            class="text-5xl sm:text-7xl font-black text-slate-800 tracking-wider mb-2"
+          >
+            FIM
+          </h2>
+          <p
+            class="text-emerald-700 font-bold text-base sm:text-xl uppercase tracking-widest"
+          >
+            Votação Encerrada
+          </p>
+          <span class="mt-4 text-xs text-slate-500"
+            >Aguarde o próximo eleitor...</span
+          >
+        </div>
+      </section>
+
+      <!-- TECLADO DA URNA -->
+      <section
+        class="w-full md:w-72 bg-slate-800 rounded-xl p-3 sm:p-4 border-2 border-slate-700 flex flex-col justify-between shadow-inner"
+      >
+        <div class="text-center mb-2 border-b border-slate-700 pb-1">
+          <span
+            class="text-slate-300 text-[10px] sm:text-xs tracking-widest font-bold uppercase"
+            >Justiça Eleitoral Escolar</span
+          >
+        </div>
+
+        <!-- Teclas Numéricas -->
+        <div class="grid grid-cols-3 gap-2 mb-3 px-1">
+          <button
+            onclick="pressionaNumero('1')"
+            class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold"
+          >
+            1
+          </button>
+          <button
+            onclick="pressionaNumero('2')"
+            class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold"
+          >
+            2
+          </button>
+          <button
+            onclick="pressionaNumero('3')"
+            class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold"
+          >
+            3
+          </button>
+          <button
+            onclick="pressionaNumero('4')"
+            class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold"
+          >
+            4
+          </button>
+          <button
+            onclick="pressionaNumero('5')"
+            class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold"
+          >
+            5
+          </button>
+          <button
+            onclick="pressionaNumero('6')"
+            class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold"
+          >
+            6
+          </button>
+          <button
+            onclick="pressionaNumero('7')"
+            class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold"
+          >
+            7
+          </button>
+          <button
+            onclick="pressionaNumero('8')"
+            class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold"
+          >
+            8
+          </button>
+          <button
+            onclick="pressionaNumero('9')"
+            class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold"
+          >
+            9
+          </button>
+          <div></div>
+          <button
+            onclick="pressionaNumero('0')"
+            class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold"
+          >
+            0
+          </button>
+          <div></div>
+        </div>
+
+        <!-- Teclas de Ação (BRANCO, CORRIGE, CONFIRMA) -->
+        <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-700">
+          <button
+            onclick="votarBranco()"
+            class="btn-branco py-2.5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-tighter"
+          >
+            Branco
+          </button>
+          <button
+            onclick="corrigir()"
+            class="btn-corrige py-2.5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-tighter"
+          >
+            Corrige
+          </button>
+          <button
+            onclick="confirmar()"
+            class="btn-confirma py-2.5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-tighter"
+          >
+            Confirma
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <div
+      id="modal-apuracao"
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 z-50"
+    >
+      <div
+        class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden text-slate-100"
+      >
+        <!-- Cabeçalho Modal -->
+        <div
+          class="bg-slate-800 p-3 border-b border-slate-700 flex justify-between items-center"
+        >
+          <h3
+            class="text-sm sm:text-base font-bold text-emerald-400 flex items-center gap-2"
+          >
+            📊 Relatório Parcial da Eleição Escolar
+          </h3>
+          <button
+            onclick="fecharApuracao()"
+            class="text-slate-400 hover:text-white font-bold text-lg px-2"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Conteúdo das Estatísticas -->
+        <div class="p-4 overflow-y-auto space-y-4 text-xs sm:text-sm">
+          <!-- SEÇÃO DE CANDIDATOS ELEITOS -->
+          <div
+            class="bg-gradient-to-r from-emerald-950/80 to-slate-900 border-2 border-emerald-500/50 p-3 rounded-xl shadow-lg"
+          >
+            <h4
+              class="font-extrabold text-emerald-400 text-xs sm:text-sm uppercase tracking-wider mb-2 flex items-center gap-1.5"
+            >
+              🏆 Candidatos Eleitos (Critério: Mais votados + Mais velho)
+            </h4>
+            <div
+              id="relatorio-eleitos"
+              class="grid grid-cols-1 sm:grid-cols-2 gap-2"
+            >
               <!-- Preenchido via Javascript -->
             </div>
           </div>
 
-          <!-- Foto do Candidato -->
-          <div id="painel-foto" class="hidden flex-col items-center bg-white p-1 rounded border-2 border-slate-400 shadow-sm w-28 sm:w-36">
-            <img id="foto-candidato" src="" alt="Candidato" class="w-full h-32 sm:h-40 object-cover rounded" />
-            <span id="rotulo-foto" class="text-[10px] sm:text-xs font-bold text-slate-700 mt-1 uppercase text-center">Presidente</span>
+          <div>
+            <h4
+              class="font-bold text-amber-400 border-b border-slate-700 pb-1 mb-2"
+            >
+              DEPUTADO
+            </h4>
+            <div id="relatorio-deputado" class="space-y-2"></div>
+          </div>
+          <div>
+            <h4
+              class="font-bold text-indigo-400 border-b border-slate-700 pb-1 mb-2"
+            >
+              PRESIDENTE
+            </h4>
+            <div id="relatorio-presidente" class="space-y-2"></div>
           </div>
         </div>
 
-        <!-- Rodapé de Instruções da Tela -->
-        <div class="border-t-2 border-slate-400 pt-2 text-[10px] sm:text-xs text-slate-700">
-          <div>Aperte a tecla:</div>
-          <div class="ml-1 font-semibold">VERDE / CONFIRMA para CONFIRMAR este voto</div>
-          <div class="ml-1 font-semibold">LARANJA / CORRIGE para REINICIAR este voto</div>
+        <!-- Rodapé do Modal -->
+        <div
+          class="bg-slate-800 p-3 border-t border-slate-700 flex justify-between items-center"
+        >
+          <button
+            onclick="zerarUrna()"
+            class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-lg text-xs transition"
+          >
+            ⚠️ Zerar Urna
+          </button>
+          <button
+            onclick="fecharApuracao()"
+            class="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg text-xs transition"
+          >
+            Fechar
+          </button>
         </div>
       </div>
-
-      <!-- Tela Final de FIM -->
-      <div id="tela-fim" class="hidden absolute inset-0 bg-emerald-100 flex-col items-center justify-center text-center p-4">
-        <h2 class="text-5xl sm:text-7xl font-black text-slate-800 tracking-wider mb-2">FIM</h2>
-        <p class="text-emerald-700 font-bold text-base sm:text-xl uppercase tracking-widest">Votação Encerrada</p>
-        <span class="mt-4 text-xs text-slate-500">Aguarde o próximo eleitor...</span>
-      </div>
-
-    </section>
-
-    <!-- TECLADO DA URNA -->
-    <section class="w-full md:w-72 bg-slate-800 rounded-xl p-3 sm:p-4 border-2 border-slate-700 flex flex-col justify-between shadow-inner">
-      <div class="text-center mb-2 border-b border-slate-700 pb-1">
-        <span class="text-slate-300 text-[10px] sm:text-xs tracking-widest font-bold uppercase">Justiça Eleitoral Escolar</span>
-      </div>
-
-      <!-- Teclas Numéricas -->
-      <div class="grid grid-cols-3 gap-2 mb-3 px-1">
-        <button onclick="pressionaNumero('1')" class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold">1</button>
-        <button onclick="pressionaNumero('2')" class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold">2</button>
-        <button onclick="pressionaNumero('3')" class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold">3</button>
-        <button onclick="pressionaNumero('4')" class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold">4</button>
-        <button onclick="pressionaNumero('5')" class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold">5</button>
-        <button onclick="pressionaNumero('6')" class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold">6</button>
-        <button onclick="pressionaNumero('7')" class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold">7</button>
-        <button onclick="pressionaNumero('8')" class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold">8</button>
-        <button onclick="pressionaNumero('9')" class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold">9</button>
-        <div></div>
-        <button onclick="pressionaNumero('0')" class="btn-key py-2 sm:py-3 rounded-lg text-xl sm:text-2xl font-bold">0</button>
-        <div></div>
-      </div>
-
-      <!-- Teclas de Ação (BRANCO, CORRIGE, CONFIRMA) -->
-      <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-700">
-        <button onclick="votarBranco()" class="btn-branco py-2.5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-tighter">Branco</button>
-        <button onclick="corrigir()" class="btn-corrige py-2.5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-tighter">Corrige</button>
-        <button onclick="confirmar()" class="btn-confirma py-2.5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-tighter">Confirma</button>
-      </div>
-    </section>
-
-  </main>
-
-  <div id="modal-apuracao" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 z-50">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden text-slate-100">
-      
-      <!-- Cabeçalho Modal -->
-      <div class="bg-slate-800 p-3 border-b border-slate-700 flex justify-between items-center">
-        <h3 class="text-sm sm:text-base font-bold text-emerald-400 flex items-center gap-2">
-          📊 Relatório Parcial da Eleição Escolar
-        </h3>
-        <button onclick="fecharApuracao()" class="text-slate-400 hover:text-white font-bold text-lg px-2">✕</button>
-      </div>
-
-      <!-- Conteúdo das Estatísticas -->
-      <div class="p-4 overflow-y-auto space-y-4 text-xs sm:text-sm">
-        
-        <!-- SEÇÃO DE CANDIDATOS ELEITOS -->
-        <div class="bg-gradient-to-r from-emerald-950/80 to-slate-900 border-2 border-emerald-500/50 p-3 rounded-xl shadow-lg">
-          <h4 class="font-extrabold text-emerald-400 text-xs sm:text-sm uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            🏆 Candidatos Eleitos (Critério: Mais votados + Mais velho)
-          </h4>
-          <div id="relatorio-eleitos" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <!-- Preenchido via Javascript -->
-          </div>
-        </div>
-
-        <div>
-          <h4 class="font-bold text-amber-400 border-b border-slate-700 pb-1 mb-2">DEPUTADO</h4>
-          <div id="relatorio-deputado" class="space-y-2"></div>
-        </div>
-        <div>
-          <h4 class="font-bold text-indigo-400 border-b border-slate-700 pb-1 mb-2">PRESIDENTE</h4>
-          <div id="relatorio-presidente" class="space-y-2"></div>
-        </div>
-      </div>
-
-      <!-- Rodapé do Modal -->
-      <div class="bg-slate-800 p-3 border-t border-slate-700 flex justify-between items-center">
-        <button onclick="zerarUrna()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-lg text-xs transition">
-          ⚠️ Zerar Urna
-        </button>
-        <button onclick="fecharApuracao()" class="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg text-xs transition">
-          Fechar
-        </button>
-      </div>
-
     </div>
-  </div>
 
-  <script>
-    // --- IMAGENS E DATAS DE NASCIMENTO DOS CANDIDATOS (Formato: AAAA-MM-DD para ordenação correta) ---
-    const CANDIDATOS = {
-      deputado: [
-        {
-          numero: '2222',
-          nome: 'João Emanuel',
-          partido: 'Partido Divertido das Crianças',
-          nascimento: '2016-08-01', // 01/08/2016
-          foto: '2222_-_Joao_Emanuel.jpg'
-        },
-        {
-          numero: '2223',
-          nome: 'Estêvão',
-          partido: 'Partido Divertido das Crianças',
-          nascimento: '2018-03-16', // 16/03/2018
-          foto: '2223_-_Estevao.jpg'
-        },
-        {
-          numero: '1211',
-          nome: 'Cecília Aguiar',
-          partido: 'Partido da Cooperação',
-          nascimento: '2016-10-05', // 05/10/2016
-          foto: '1211_-_Cecilia_Aguiar.jpg'
-        },
-        {
-          numero: '1210',
-          nome: 'Sophia',
-          partido: 'Partido da Cooperação',
-          nascimento: '2015-11-17', // 17/11/2015
-          foto: '1210_-_Sophia.jpg'
-        }
-      ],
-      presidente: [
-        {
-          numero: '22',
-          nome: 'Joaquim',
-          partido: 'Partido Divertido das Crianças',
-          nascimento: '2014-09-08', // 08/09/2014
-          foto: '22_-_Joaquim.jpg'
-        },
-        {
-          numero: '12',
-          nome: 'Lívia',
-          partido: 'Partido da Cooperação',
-          nascimento: '2014-04-02', // 02/04/2014
-          foto: '12_-_Livia.jpg'
-        }
-      ]
-    };
+    <script>
+      // --- IMAGENS E DATAS DE NASCIMENTO DOS CANDIDATOS (Formato: AAAA-MM-DD para ordenação correta) ---
+      const CANDIDATOS = {
+        deputado: [
+          {
+            numero: "2222",
+            nome: "João Emanuel",
+            partido: "Partido Divertido das Crianças",
+            nascimento: "2016-08-01", // 01/08/2016
+            foto: "2222_-_Joao_Emanuel.jpg",
+          },
+          {
+            numero: "2223",
+            nome: "Estêvão",
+            partido: "Partido Divertido das Crianças",
+            nascimento: "2018-03-16", // 16/03/2018
+            foto: "2223_-_Estevao.jpg",
+          },
+          {
+            numero: "1211",
+            nome: "Cecília Aguiar",
+            partido: "Partido da Cooperação",
+            nascimento: "2018-08-15", // 15/08/2018
+            foto: "1211_-_Cecilia_Aguiar.jpg",
+          },
+          {
+            numero: "1210",
+            nome: "Sophia",
+            partido: "Partido da Cooperação",
+            nascimento: "2015-11-17", // 17/11/2015
+            foto: "1210_-_Sophia.jpg",
+          },
+        ],
+        presidente: [
+          {
+            numero: "22",
+            nome: "Joaquim",
+            partido: "Partido Divertido das Crianças",
+            nascimento: "2014-09-08", // 08/09/2014
+            foto: "22_-_Joaquim.jpg",
+          },
+          {
+            numero: "12",
+            nome: "Lívia",
+            partido: "Partido da Cooperação",
+            nascimento: "2014-04-02", // 02/04/2014
+            foto: "12_-_Livia.jpg",
+          },
+        ],
+      };
 
-    // Estágios de Votação
-    const ETAPAS = [
-      { cargo: 'deputado', titulo: 'DEPUTADO', digitos: 4 },
-      { cargo: 'presidente', titulo: 'PRESIDENTE', digitos: 2 }
-    ];
+      // Estágios de Votação
+      const ETAPAS = [
+        { cargo: "deputado", titulo: "DEPUTADO", digitos: 4 },
+        { cargo: "presidente", titulo: "PRESIDENTE", digitos: 2 },
+      ];
 
-    // Estado Atual
-    let etapaAtual = 0;
-    let numeroDigitado = '';
-    let votoBranco = false;
-    let votosArmazenados = {
-      deputado: {},
-      presidente: {}
-    };
+      // Estado Atual
+      let etapaAtual = 0;
+      let numeroDigitado = "";
+      let votoBranco = false;
+      let votosArmazenados = {
+        deputado: {},
+        presidente: {},
+      };
 
-    // --- REPRODUTORES DE ÁUDIO MP3 LOCAIS ---
-    const somTecla = new Audio('tecla.mp3');
-    const somConfirma = new Audio('confirma.mp3');
-    const somFim = new Audio('fim.mp3');
+      // --- REPRODUTORES DE ÁUDIO MP3 LOCAIS ---
+      const somTecla = new Audio("tecla.mp3");
+      const somConfirma = new Audio("confirma.mp3");
+      const somFim = new Audio("fim.mp3");
 
-    // Função de ativação exigida pelo Android
-    function liberarAudioAndroid() {
-      somTecla.play().then(() => {
-        somTecla.pause();
-        somTecla.currentTime = 0;
-      }).catch(() => {});
-      
-      somConfirma.play().then(() => {
-        somConfirma.pause();
-        somConfirma.currentTime = 0;
-      }).catch(() => {});
+      // Função de ativação exigida pelo Android
+      function liberarAudioAndroid() {
+        somTecla
+          .play()
+          .then(() => {
+            somTecla.pause();
+            somTecla.currentTime = 0;
+          })
+          .catch(() => {});
 
-      somFim.play().then(() => {
-        somFim.pause();
-        somFim.currentTime = 0;
-      }).catch(() => {});
+        somConfirma
+          .play()
+          .then(() => {
+            somConfirma.pause();
+            somConfirma.currentTime = 0;
+          })
+          .catch(() => {});
 
-      // Oculta a tela de boas-vindas/desbloqueio
-      document.getElementById('overlay-inicio').style.display = 'none';
-    }
+        somFim
+          .play()
+          .then(() => {
+            somFim.pause();
+            somFim.currentTime = 0;
+          })
+          .catch(() => {});
 
-    function tocarSomTecla() {
-      try {
-        somTecla.currentTime = 0;
-        somTecla.play().catch(e => console.log("Áudio bloqueado", e));
-      } catch (e) {
-        console.error("Erro ao reproduzir som de tecla", e);
+        // Oculta a tela de boas-vindas/desbloqueio
+        document.getElementById("overlay-inicio").style.display = "none";
       }
-    }
 
-    function tocarSomConfirma() {
-      try {
-        somConfirma.currentTime = 0;
-        somConfirma.play().catch(e => console.log("Áudio bloqueado", e));
-      } catch (e) {
-        console.error("Erro ao reproduzir som de confirmação", e);
-      }
-    }
-
-    function tocarSomFim() {
-      try {
-        somFim.currentTime = 0;
-        somFim.play().catch(e => console.log("Áudio bloqueado", e));
-      } catch (e) {
-        console.error("Erro ao reproduzir som de FIM", e);
-      }
-    }
-
-    // --- FUNÇÃO DE TELA CHEIA ---
-    function alternarTelaCheia() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          console.log(err.message);
-        });
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
+      function tocarSomTecla() {
+        try {
+          somTecla.currentTime = 0;
+          somTecla.play().catch((e) => console.log("Áudio bloqueado", e));
+        } catch (e) {
+          console.error("Erro ao reproduzir som de tecla", e);
         }
       }
-    }
 
-    document.addEventListener('fullscreenchange', () => {
-      const btn = document.getElementById('btn-fullscreen');
-      if (!document.fullscreenElement) {
-        btn.innerText = '⛶ Tela Cheia';
-      } else {
-        btn.innerText = '⛶ Sair Tela Cheia';
-      }
-    });
-
-    // --- INICIALIZAÇÃO DA TELA DE VOTAÇÃO ---
-    function iniciarEtapa() {
-      const etapa = ETAPAS[etapaAtual];
-      numeroDigitado = '';
-      votoBranco = false;
-
-      document.getElementById('cargo-nome').innerText = etapa.titulo;
-      document.getElementById('tela-votacao').style.display = 'flex';
-      document.getElementById('tela-fim').style.display = 'none';
-
-      const containerNumeros = document.getElementById('caixa-numeros');
-      containerNumeros.innerHTML = '';
-      for (let i = 0; i < etapa.digitos; i++) {
-        const div = document.createElement('div');
-        div.className = `digit-box ${i === 0 ? 'active' : ''}`;
-        div.id = `digito-${i}`;
-        containerNumeros.appendChild(div);
+      function tocarSomConfirma() {
+        try {
+          somConfirma.currentTime = 0;
+          somConfirma.play().catch((e) => console.log("Áudio bloqueado", e));
+        } catch (e) {
+          console.error("Erro ao reproduzir som de confirmação", e);
+        }
       }
 
-      document.getElementById('dados-candidato').innerHTML = '';
-      document.getElementById('painel-foto').style.display = 'none';
-    }
-
-    // --- MANIPULAÇÃO DE TECLAS ---
-    function pressionaNumero(n) {
-      tocarSomTecla();
-      if (votoBranco) return;
-
-      const etapa = ETAPAS[etapaAtual];
-      if (numeroDigitado.length < etapa.digitos) {
-        numeroDigitado += n;
-        atualizarInterfaceDigitos();
+      function tocarSomFim() {
+        try {
+          somFim.currentTime = 0;
+          somFim.play().catch((e) => console.log("Áudio bloqueado", e));
+        } catch (e) {
+          console.error("Erro ao reproduzir som de FIM", e);
+        }
       }
-    }
 
-    function atualizarInterfaceDigitos() {
-      const etapa = ETAPAS[etapaAtual];
-      
-      for (let i = 0; i < etapa.digitos; i++) {
-        const box = document.getElementById(`digito-${i}`);
-        if (box) {
-          if (i < numeroDigitado.length) {
-            box.innerText = numeroDigitado[i];
-            box.classList.remove('active');
-          } else if (i === numeroDigitado.length) {
-            box.innerText = '';
-            box.classList.add('active');
-          } else {
-            box.innerText = '';
-            box.classList.remove('active');
+      // --- FUNÇÃO DE TELA CHEIA ---
+      function alternarTelaCheia() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch((err) => {
+            console.log(err.message);
+          });
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
           }
         }
       }
 
-      if (numeroDigitado.length === etapa.digitos) {
-        const lista = CANDIDATOS[etapa.cargo];
-        const candidato = lista.find(c => c.numero === numeroDigitado);
+      document.addEventListener("fullscreenchange", () => {
+        const btn = document.getElementById("btn-fullscreen");
+        if (!document.fullscreenElement) {
+          btn.innerText = "⛶ Tela Cheia";
+        } else {
+          btn.innerText = "⛶ Sair Tela Cheia";
+        }
+      });
 
-        const dadosDiv = document.getElementById('dados-candidato');
-        const painelFoto = document.getElementById('painel-foto');
-        const imgCandidato = document.getElementById('foto-candidato');
-        const rotuloFoto = document.getElementById('rotulo-foto');
+      // --- INICIALIZAÇÃO DA TELA DE VOTAÇÃO ---
+      function iniciarEtapa() {
+        const etapa = ETAPAS[etapaAtual];
+        numeroDigitado = "";
+        votoBranco = false;
 
-        if (candidato) {
-          dadosDiv.innerHTML = `
+        document.getElementById("cargo-nome").innerText = etapa.titulo;
+        document.getElementById("tela-votacao").style.display = "flex";
+        document.getElementById("tela-fim").style.display = "none";
+
+        const containerNumeros = document.getElementById("caixa-numeros");
+        containerNumeros.innerHTML = "";
+        for (let i = 0; i < etapa.digitos; i++) {
+          const div = document.createElement("div");
+          div.className = `digit-box ${i === 0 ? "active" : ""}`;
+          div.id = `digito-${i}`;
+          containerNumeros.appendChild(div);
+        }
+
+        document.getElementById("dados-candidato").innerHTML = "";
+        document.getElementById("painel-foto").style.display = "none";
+      }
+
+      // --- MANIPULAÇÃO DE TECLAS ---
+      function pressionaNumero(n) {
+        tocarSomTecla();
+        if (votoBranco) return;
+
+        const etapa = ETAPAS[etapaAtual];
+        if (numeroDigitado.length < etapa.digitos) {
+          numeroDigitado += n;
+          atualizarInterfaceDigitos();
+        }
+      }
+
+      function atualizarInterfaceDigitos() {
+        const etapa = ETAPAS[etapaAtual];
+
+        for (let i = 0; i < etapa.digitos; i++) {
+          const box = document.getElementById(`digito-${i}`);
+          if (box) {
+            if (i < numeroDigitado.length) {
+              box.innerText = numeroDigitado[i];
+              box.classList.remove("active");
+            } else if (i === numeroDigitado.length) {
+              box.innerText = "";
+              box.classList.add("active");
+            } else {
+              box.innerText = "";
+              box.classList.remove("active");
+            }
+          }
+        }
+
+        if (numeroDigitado.length === etapa.digitos) {
+          const lista = CANDIDATOS[etapa.cargo];
+          const candidato = lista.find((c) => c.numero === numeroDigitado);
+
+          const dadosDiv = document.getElementById("dados-candidato");
+          const painelFoto = document.getElementById("painel-foto");
+          const imgCandidato = document.getElementById("foto-candidato");
+          const rotuloFoto = document.getElementById("rotulo-foto");
+
+          if (candidato) {
+            dadosDiv.innerHTML = `
             <div><span class="font-bold">Nome:</span> <span class="text-xs sm:text-base font-extrabold uppercase">${candidato.nome}</span></div>
             <div><span class="font-bold">Partido:</span> ${candidato.partido}</div>
           `;
-          imgCandidato.src = candidato.foto;
-          rotuloFoto.innerText = etapa.titulo;
-          painelFoto.style.display = 'flex';
-        } else {
-          dadosDiv.innerHTML = `
+            imgCandidato.src = candidato.foto;
+            rotuloFoto.innerText = etapa.titulo;
+            painelFoto.style.display = "flex";
+          } else {
+            dadosDiv.innerHTML = `
             <div class="mt-2 text-center font-black text-sm sm:text-xl text-red-600 pisca-texto">
               NÚMERO ERRADO<br/><span class="text-xs sm:text-lg font-bold">VOTO NULO</span>
             </div>
           `;
-          painelFoto.style.display = 'none';
-        }
-      }
-    }
-
-    function votarBranco() {
-      tocarSomTecla();
-      const etapa = ETAPAS[etapaAtual];
-      numeroDigitado = '';
-      votoBranco = true;
-
-      for (let i = 0; i < etapa.digitos; i++) {
-        const box = document.getElementById(`digito-${i}`);
-        if (box) {
-          box.innerText = '';
-          box.classList.remove('active');
+            painelFoto.style.display = "none";
+          }
         }
       }
 
-      const dadosDiv = document.getElementById('dados-candidato');
-      dadosDiv.innerHTML = `
+      function votarBranco() {
+        tocarSomTecla();
+        const etapa = ETAPAS[etapaAtual];
+        numeroDigitado = "";
+        votoBranco = true;
+
+        for (let i = 0; i < etapa.digitos; i++) {
+          const box = document.getElementById(`digito-${i}`);
+          if (box) {
+            box.innerText = "";
+            box.classList.remove("active");
+          }
+        }
+
+        const dadosDiv = document.getElementById("dados-candidato");
+        dadosDiv.innerHTML = `
         <div class="mt-2 text-center font-black text-sm sm:text-xl text-slate-800 pisca-texto">
           VOTO EM BRANCO
         </div>
       `;
-      document.getElementById('painel-foto').style.display = 'none';
-    }
-
-    function corrigir() {
-      tocarSomTecla();
-      iniciarEtapa();
-    }
-
-    function confirmar() {
-      const etapa = ETAPAS[etapaAtual];
-      let votoValido = false;
-
-      if (votoBranco) {
-        votoValido = true;
-        registrarVoto(etapa.cargo, 'BRANCO');
-      } else if (numeroDigitado.length === etapa.digitos) {
-        votoValido = true;
-        const candidato = CANDIDATOS[etapa.cargo].find(c => c.numero === numeroDigitado);
-        if (candidato) {
-          registrarVoto(etapa.cargo, candidato.numero);
-        } else {
-          registrarVoto(etapa.cargo, 'NULO');
-        }
+        document.getElementById("painel-foto").style.display = "none";
       }
 
-      if (votoValido) {
-        // Toca o som confirma.mp3 exclusivamente ao confirmar o cargo de deputado
-        if (etapa.cargo === 'deputado') {
-          tocarSomConfirma();
+      function corrigir() {
+        tocarSomTecla();
+        iniciarEtapa();
+      }
+
+      function confirmar() {
+        const etapa = ETAPAS[etapaAtual];
+        let votoValido = false;
+
+        if (votoBranco) {
+          votoValido = true;
+          registrarVoto(etapa.cargo, "BRANCO");
+        } else if (numeroDigitado.length === etapa.digitos) {
+          votoValido = true;
+          const candidato = CANDIDATOS[etapa.cargo].find(
+            (c) => c.numero === numeroDigitado,
+          );
+          if (candidato) {
+            registrarVoto(etapa.cargo, candidato.numero);
+          } else {
+            registrarVoto(etapa.cargo, "NULO");
+          }
         }
 
-        etapaAtual++;
-
-        if (etapaAtual < ETAPAS.length) {
-          if (etapa.cargo !== 'deputado') {
-            tocarSomTecla();
+        if (votoValido) {
+          // Toca o som confirma.mp3 exclusivamente ao confirmar o cargo de deputado
+          if (etapa.cargo === "deputado") {
+            tocarSomConfirma();
           }
-          iniciarEtapa();
-        } else {
-          tocarSomFim();
-          document.getElementById('tela-votacao').style.display = 'none';
-          document.getElementById('tela-fim').style.display = 'flex';
 
-          setTimeout(() => {
-            etapaAtual = 0;
+          etapaAtual++;
+
+          if (etapaAtual < ETAPAS.length) {
+            if (etapa.cargo !== "deputado") {
+              tocarSomTecla();
+            }
             iniciarEtapa();
-          }, 4000);
-        }
-      }
-    }
+          } else {
+            tocarSomFim();
+            document.getElementById("tela-votacao").style.display = "none";
+            document.getElementById("tela-fim").style.display = "flex";
 
-    // --- GESTÃO DE VOTOS ---
-    function registrarVoto(cargo, chave) {
-      if (!votosArmazenados[cargo][chave]) {
-        votosArmazenados[cargo][chave] = 0;
-      }
-      votosArmazenados[cargo][chave]++;
-      salvarVotosLocal();
-    }
-
-    function salvarVotosLocal() {
-      localStorage.setItem('urna_votos_escola', JSON.stringify(votosArmazenados));
-    }
-
-    function carregarVotosLocal() {
-      const salvas = localStorage.getItem('urna_votos_escola');
-      if (salvas) {
-        try {
-          votosArmazenados = JSON.parse(salvas);
-        } catch (e) {
-          console.error('Erro ao carregar votos', e);
-        }
-      }
-    }
-
-    // --- MODAL DE APURAÇÃO / RELATÓRIO ---
-    function abrirApuracao() {
-      renderizarRelatorio();
-      document.getElementById('modal-apuracao').classList.remove('hidden');
-      document.getElementById('modal-apuracao').classList.add('flex');
-    }
-
-    function fecharApuracao() {
-      document.getElementById('modal-apuracao').classList.add('hidden');
-      document.getElementById('modal-apuracao').classList.remove('flex');
-    }
-
-    function renderizarRelatorio() {
-      renderizarEleitos();
-
-      const containerDep = document.getElementById('relatorio-deputado');
-      containerDep.innerHTML = gerarHtmlCargo('deputado');
-
-      const containerPres = document.getElementById('relatorio-presidente');
-      containerPres.innerHTML = gerarHtmlCargo('presidente');
-    }
-
-    // FUNÇÃO QUE CALCULA E EXIBE OS MAIS VOTADOS (COM CRITÉRIO DE DESEMPATE: MAIS VELHO)
-    function renderizarEleitos() {
-      const containerEleitos = document.getElementById('relatorio-eleitos');
-      
-      const deputadoEleito = obterMaisVotado('deputado');
-      const presidenteEleito = obterMaisVotado('presidente');
-
-      let html = '';
-      html += criarCardEleito('Deputado Eleito', deputadoEleito, 'text-amber-400');
-      html += criarCardEleito('Presidente Eleito', presidenteEleito, 'text-indigo-400');
-
-      containerEleitos.innerHTML = html;
-    }
-
-    function obterMaisVotado(cargo) {
-      const lista = CANDIDATOS[cargo];
-      const votosCargo = votosArmazenados[cargo] || {};
-
-      let maisVotado = null;
-      let maiorVotos = -1;
-
-      lista.forEach(c => {
-        const qtd = votosCargo[c.numero] || 0;
-
-        if (qtd > maiorVotos) {
-          // Se tem mais votos do que o atual líder, assume a liderança
-          maiorVotos = qtd;
-          maisVotado = { 
-            nome: c.nome, 
-            partido: c.partido, 
-            numero: c.numero, 
-            foto: c.foto, 
-            nascimento: c.nascimento,
-            votos: qtd 
-          };
-        } else if (qtd === maiorVotos && maiorVotos > 0) {
-          // EMPATE NA QUANTIDADE DE VOTOS: Critério de desempate = Data de nascimento (o mais velho tem data anterior)
-          if (c.nascimento < maisVotado.nascimento) {
-            maisVotado = { 
-              nome: c.nome, 
-              partido: c.partido, 
-              numero: c.numero, 
-              foto: c.foto, 
-              nascimento: c.nascimento,
-              votos: qtd 
-            };
+            setTimeout(() => {
+              etapaAtual = 0;
+              iniciarEtapa();
+            }, 4000);
           }
         }
-      });
-
-      // Se ninguém recebeu votos, exibe o primeiro candidato da lista como referência mas com 0 votos
-      if (!maisVotado || maiorVotos === 0) {
-        const primeiro = lista[0];
-        return { 
-          nome: primeiro.nome, 
-          partido: 'Aguardando votos', 
-          numero: primeiro.numero, 
-          votos: 0, 
-          foto: primeiro.foto 
-        };
       }
 
-      return maisVotado;
-    }
+      // --- GESTÃO DE VOTOS ---
+      function registrarVoto(cargo, chave) {
+        if (!votosArmazenados[cargo][chave]) {
+          votosArmazenados[cargo][chave] = 0;
+        }
+        votosArmazenados[cargo][chave]++;
+        salvarVotosLocal();
+      }
 
-    function criarCardEleito(tituloCargo, candidato, corTexto) {
-      return `
+      function salvarVotosLocal() {
+        localStorage.setItem(
+          "urna_votos_escola",
+          JSON.stringify(votosArmazenados),
+        );
+      }
+
+      function carregarVotosLocal() {
+        const salvas = localStorage.getItem("urna_votos_escola");
+        if (salvas) {
+          try {
+            votosArmazenados = JSON.parse(salvas);
+          } catch (e) {
+            console.error("Erro ao carregar votos", e);
+          }
+        }
+      }
+
+      // --- MODAL DE APURAÇÃO / RELATÓRIO ---
+      function abrirApuracao() {
+        renderizarRelatorio();
+        document.getElementById("modal-apuracao").classList.remove("hidden");
+        document.getElementById("modal-apuracao").classList.add("flex");
+      }
+
+      function fecharApuracao() {
+        document.getElementById("modal-apuracao").classList.add("hidden");
+        document.getElementById("modal-apuracao").classList.remove("flex");
+      }
+
+      function renderizarRelatorio() {
+        renderizarEleitos();
+
+        const containerDep = document.getElementById("relatorio-deputado");
+        containerDep.innerHTML = gerarHtmlCargo("deputado");
+
+        const containerPres = document.getElementById("relatorio-presidente");
+        containerPres.innerHTML = gerarHtmlCargo("presidente");
+      }
+
+      // FUNÇÃO QUE CALCULA E EXIBE OS MAIS VOTADOS (COM CRITÉRIO DE DESEMPATE: MAIS VELHO)
+      function renderizarEleitos() {
+        const containerEleitos = document.getElementById("relatorio-eleitos");
+
+        const deputadoEleito = obterMaisVotado("deputado");
+        const presidenteEleito = obterMaisVotado("presidente");
+
+        let html = "";
+        html += criarCardEleito(
+          "Deputado Eleito",
+          deputadoEleito,
+          "text-amber-400",
+        );
+        html += criarCardEleito(
+          "Presidente Eleito",
+          presidenteEleito,
+          "text-indigo-400",
+        );
+
+        containerEleitos.innerHTML = html;
+      }
+
+      function obterMaisVotado(cargo) {
+        const lista = CANDIDATOS[cargo];
+        const votosCargo = votosArmazenados[cargo] || {};
+
+        let maisVotado = null;
+        let maiorVotos = -1;
+
+        lista.forEach((c) => {
+          const qtd = votosCargo[c.numero] || 0;
+
+          if (qtd > maiorVotos) {
+            // Se tem mais votos do que o atual líder, assume a liderança
+            maiorVotos = qtd;
+            maisVotado = {
+              nome: c.nome,
+              partido: c.partido,
+              numero: c.numero,
+              foto: c.foto,
+              nascimento: c.nascimento,
+              votos: qtd,
+            };
+          } else if (qtd === maiorVotos && maiorVotos > 0) {
+            // EMPATE NA QUANTIDADE DE VOTOS: Critério de desempate = Data de nascimento (o mais velho tem data anterior)
+            if (c.nascimento < maisVotado.nascimento) {
+              maisVotado = {
+                nome: c.nome,
+                partido: c.partido,
+                numero: c.numero,
+                foto: c.foto,
+                nascimento: c.nascimento,
+                votos: qtd,
+              };
+            }
+          }
+        });
+
+        // Se ninguém recebeu votos, exibe o primeiro candidato da lista como referência mas com 0 votos
+        if (!maisVotado || maiorVotos === 0) {
+          const primeiro = lista[0];
+          return {
+            nome: primeiro.nome,
+            partido: "Aguardando votos",
+            numero: primeiro.numero,
+            votos: 0,
+            foto: primeiro.foto,
+          };
+        }
+
+        return maisVotado;
+      }
+
+      function criarCardEleito(tituloCargo, candidato, corTexto) {
+        return `
         <div class="bg-slate-800/90 p-2 rounded-lg border border-slate-700 flex items-center space-x-2">
           <img src="${candidato.foto}" class="w-10 h-10 rounded-full object-cover border border-emerald-500 shadow" alt="${candidato.nome}" onerror="this.src='https://via.placeholder.com/40?text=Foto'" />
           <div class="overflow-hidden">
@@ -685,22 +903,23 @@
           </div>
         </div>
       `;
-    }
+      }
 
-    function gerarHtmlCargo(cargo) {
-      const lista = CANDIDATOS[cargo];
-      const votosCargo = votosArmazenados[cargo] || {};
-      
-      let totalVotos = 0;
-      Object.values(votosCargo).forEach(v => totalVotos += v);
+      function gerarHtmlCargo(cargo) {
+        const lista = CANDIDATOS[cargo];
+        const votosCargo = votosArmazenados[cargo] || {};
 
-      let html = `<div class="bg-slate-800 p-2 rounded-lg border border-slate-700 mb-2 font-semibold">Total de votos apurados: <span class="text-emerald-400 font-bold">${totalVotos}</span></div>`;
-      html += `<div class="grid gap-2">`;
+        let totalVotos = 0;
+        Object.values(votosCargo).forEach((v) => (totalVotos += v));
 
-      lista.forEach(c => {
-        const qtd = votosCargo[c.numero] || 0;
-        const perc = totalVotos > 0 ? ((qtd / totalVotos) * 100).toFixed(1) : '0.0';
-        html += `
+        let html = `<div class="bg-slate-800 p-2 rounded-lg border border-slate-700 mb-2 font-semibold">Total de votos apurados: <span class="text-emerald-400 font-bold">${totalVotos}</span></div>`;
+        html += `<div class="grid gap-2">`;
+
+        lista.forEach((c) => {
+          const qtd = votosCargo[c.numero] || 0;
+          const perc =
+            totalVotos > 0 ? ((qtd / totalVotos) * 100).toFixed(1) : "0.0";
+          html += `
           <div class="flex items-center justify-between bg-slate-800/80 p-2 rounded-lg border border-slate-700">
             <div class="flex items-center space-x-2">
               <img src="${c.foto}" class="w-8 h-8 rounded-full object-cover border border-slate-500" />
@@ -715,11 +934,12 @@
             </div>
           </div>
         `;
-      });
+        });
 
-      const qtdBranco = votosCargo['BRANCO'] || 0;
-      const percBranco = totalVotos > 0 ? ((qtdBranco / totalVotos) * 100).toFixed(1) : '0.0';
-      html += `
+        const qtdBranco = votosCargo["BRANCO"] || 0;
+        const percBranco =
+          totalVotos > 0 ? ((qtdBranco / totalVotos) * 100).toFixed(1) : "0.0";
+        html += `
         <div class="flex items-center justify-between bg-slate-800/40 p-2 rounded-lg border border-slate-700">
           <div class="font-bold text-slate-300 text-xs">VOTOS EM BRANCO</div>
           <div class="text-right">
@@ -729,9 +949,10 @@
         </div>
       `;
 
-      const qtdNulo = votosCargo['NULO'] || 0;
-      const percNulo = totalVotos > 0 ? ((qtdNulo / totalVotos) * 100).toFixed(1) : '0.0';
-      html += `
+        const qtdNulo = votosCargo["NULO"] || 0;
+        const percNulo =
+          totalVotos > 0 ? ((qtdNulo / totalVotos) * 100).toFixed(1) : "0.0";
+        html += `
         <div class="flex items-center justify-between bg-slate-800/40 p-2 rounded-lg border border-slate-700">
           <div class="font-bold text-slate-400 text-xs">VOTOS NULOS</div>
           <div class="text-right">
@@ -741,22 +962,26 @@
         </div>
       `;
 
-      html += `</div>`;
-      return html;
-    }
-
-    function zerarUrna() {
-      if (confirm("Tem certeza de que deseja ZERAR todos os votos registrados nesta urna?")) {
-        votosArmazenados = { deputado: {}, presidente: {} };
-        salvarVotosLocal();
-        renderizarRelatorio();
+        html += `</div>`;
+        return html;
       }
-    }
 
-    window.onload = function() {
-      carregarVotosLocal();
-      iniciarEtapa();
-    };
-  </script>
-</body>
+      function zerarUrna() {
+        if (
+          confirm(
+            "Tem certeza de que deseja ZERAR todos os votos registrados nesta urna?",
+          )
+        ) {
+          votosArmazenados = { deputado: {}, presidente: {} };
+          salvarVotosLocal();
+          renderizarRelatorio();
+        }
+      }
+
+      window.onload = function () {
+        carregarVotosLocal();
+        iniciarEtapa();
+      };
+    </script>
+  </body>
 </html>
