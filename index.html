@@ -235,6 +235,17 @@
 
       <!-- Conteúdo das Estatísticas -->
       <div class="p-4 overflow-y-auto space-y-4 text-xs sm:text-sm">
+        
+        <!-- SEÇÃO DE CANDIDATOS ELEITOS -->
+        <div class="bg-gradient-to-r from-emerald-950/80 to-slate-900 border-2 border-emerald-500/50 p-3 rounded-xl shadow-lg">
+          <h4 class="font-extrabold text-emerald-400 text-xs sm:text-sm uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            🏆 Candidatos Eleitos (Mais Votados)
+          </h4>
+          <div id="relatorio-eleitos" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <!-- Preenchido via Javascript -->
+          </div>
+        </div>
+
         <div>
           <h4 class="font-bold text-amber-400 border-b border-slate-700 pb-1 mb-2">DEPUTADO</h4>
           <div id="relatorio-deputado" class="space-y-2"></div>
@@ -583,11 +594,63 @@
     }
 
     function renderizarRelatorio() {
+      renderizarEleitos();
+
       const containerDep = document.getElementById('relatorio-deputado');
       containerDep.innerHTML = gerarHtmlCargo('deputado');
 
       const containerPres = document.getElementById('relatorio-presidente');
       containerPres.innerHTML = gerarHtmlCargo('presidente');
+    }
+
+    // Função para identificar e renderizar os eleitos
+    function renderizarEleitos() {
+      const containerEleitos = document.getElementById('relatorio-eleitos');
+      
+      const deputadoEleito = obterMaisVotado('deputado');
+      const presidenteEleito = obterMaisVotado('presidente');
+
+      let html = '';
+      html += criarCardEleito('Deputado Eleito', deputadoEleito, 'text-amber-400');
+      html += criarCardEleito('Presidente Eleito', presidenteEleito, 'text-indigo-400');
+
+      containerEleitos.innerHTML = html;
+    }
+
+    function obterMaisVotado(cargo) {
+      const lista = CANDIDATOS[cargo];
+      const votosCargo = votosArmazenados[cargo] || {};
+
+      let maisVotado = null;
+      let maiorVotos = -1;
+
+      lista.forEach(c => {
+        const qtd = votosCargo[c.numero] || 0;
+        if (qtd > maiorVotos) {
+          maiorVotos = qtd;
+          maisVotado = { ...c, votos: qtd };
+        }
+      });
+
+      // Se ninguém recebeu votos, retorna o primeiro da lista com 0 votos para exibição padrão
+      if (!maisVotado || maiorVotos === 0) {
+        return { nome: 'Nenhum definido', partido: 'Aguardando votos', numero: '----', votos: 0, foto: '' };
+      }
+
+      return maisVotado;
+    }
+
+    function criarCardEleito(tituloCargo, candidato, corTexto) {
+      return `
+        <div class="bg-slate-800/90 p-2 rounded-lg border border-slate-700 flex items-center space-x-2">
+          ${candidato.foto ? `<img src="\${candidato.foto}" class="w-10 h-10 rounded-full object-cover border border-emerald-500" />` : `<div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-xs">?</div>`}
+          <div class="overflow-hidden">
+            <div class="text-[10px] font-bold ${corTexto} uppercase">${tituloCargo}</div>
+            <div class="font-extrabold text-white text-xs truncate">${candidato.nome}</div>
+            <div class="text-[10px] text-emerald-400 font-semibold">${candidato.votos} voto(s)</div>
+          </div>
+        </div>
+      `;
     }
 
     function gerarHtmlCargo(cargo) {
