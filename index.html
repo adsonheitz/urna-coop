@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Simulador de Urna Eletrônica - Eleição Escolar</title>
+  <title>Simulador de Urna Eletrônica - Cooperativa Educando com Propósito</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;700;900&display=swap');
@@ -239,7 +239,7 @@
         <!-- SEÇÃO DE CANDIDATOS ELEITOS -->
         <div class="bg-gradient-to-r from-emerald-950/80 to-slate-900 border-2 border-emerald-500/50 p-3 rounded-xl shadow-lg">
           <h4 class="font-extrabold text-emerald-400 text-xs sm:text-sm uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            🏆 Candidatos Eleitos (Mais Votados)
+            🏆 Candidatos Eleitos (Critério: Mais votados + Mais velho)
           </h4>
           <div id="relatorio-eleitos" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <!-- Preenchido via Javascript -->
@@ -270,31 +270,35 @@
   </div>
 
   <script>
-    // --- IMAGENS DOS CANDIDATOS ---
+    // --- IMAGENS E DATAS DE NASCIMENTO DOS CANDIDATOS (Formato: AAAA-MM-DD para ordenação correta) ---
     const CANDIDATOS = {
       deputado: [
         {
           numero: '2222',
           nome: 'João Emanuel',
           partido: 'Partido Divertido das Crianças',
+          nascimento: '2016-08-01', // 01/08/2016
           foto: '2222_-_Joao_Emanuel.jpg'
         },
         {
           numero: '2223',
           nome: 'Estêvão',
           partido: 'Partido Divertido das Crianças',
+          nascimento: '2018-03-16', // 16/03/2018
           foto: '2223_-_Estevao.jpg'
         },
         {
           numero: '1211',
           nome: 'Cecília Aguiar',
           partido: 'Partido da Cooperação',
+          nascimento: '2016-10-05', // 05/10/2016
           foto: '1211_-_Cecilia_Aguiar.jpg'
         },
         {
           numero: '1210',
           nome: 'Sophia',
           partido: 'Partido da Cooperação',
+          nascimento: '2015-11-17', // 17/11/2015
           foto: '1210_-_Sophia.jpg'
         }
       ],
@@ -303,12 +307,14 @@
           numero: '22',
           nome: 'Joaquim',
           partido: 'Partido Divertido das Crianças',
+          nascimento: '2014-09-08', // 08/09/2014
           foto: '22_-_Joaquim.jpg'
         },
         {
           numero: '12',
           nome: 'Lívia',
           partido: 'Partido da Cooperação',
+          nascimento: '2014-04-02', // 02/04/2014
           foto: '12_-_Livia.jpg'
         }
       ]
@@ -603,7 +609,7 @@
       containerPres.innerHTML = gerarHtmlCargo('presidente');
     }
 
-    // Função para identificar e renderizar os eleitos
+    // FUNÇÃO QUE CALCULA E EXIBE OS MAIS VOTADOS (COM CRITÉRIO DE DESEMPATE: MAIS VELHO)
     function renderizarEleitos() {
       const containerEleitos = document.getElementById('relatorio-eleitos');
       
@@ -626,15 +632,43 @@
 
       lista.forEach(c => {
         const qtd = votosCargo[c.numero] || 0;
+
         if (qtd > maiorVotos) {
+          // Se tem mais votos do que o atual líder, assume a liderança
           maiorVotos = qtd;
-          maisVotado = { ...c, votos: qtd };
+          maisVotado = { 
+            nome: c.nome, 
+            partido: c.partido, 
+            numero: c.numero, 
+            foto: c.foto, 
+            nascimento: c.nascimento,
+            votos: qtd 
+          };
+        } else if (qtd === maiorVotos && maiorVotos > 0) {
+          // EMPATE NA QUANTIDADE DE VOTOS: Critério de desempate = Data de nascimento (o mais velho tem data anterior)
+          if (c.nascimento < maisVotado.nascimento) {
+            maisVotado = { 
+              nome: c.nome, 
+              partido: c.partido, 
+              numero: c.numero, 
+              foto: c.foto, 
+              nascimento: c.nascimento,
+              votos: qtd 
+            };
+          }
         }
       });
 
-      // Se ninguém recebeu votos, retorna o primeiro da lista com 0 votos para exibição padrão
+      // Se ninguém recebeu votos, exibe o primeiro candidato da lista como referência mas com 0 votos
       if (!maisVotado || maiorVotos === 0) {
-        return { nome: 'Nenhum definido', partido: 'Aguardando votos', numero: '----', votos: 0, foto: '' };
+        const primeiro = lista[0];
+        return { 
+          nome: primeiro.nome, 
+          partido: 'Aguardando votos', 
+          numero: primeiro.numero, 
+          votos: 0, 
+          foto: primeiro.foto 
+        };
       }
 
       return maisVotado;
@@ -643,9 +677,9 @@
     function criarCardEleito(tituloCargo, candidato, corTexto) {
       return `
         <div class="bg-slate-800/90 p-2 rounded-lg border border-slate-700 flex items-center space-x-2">
-          ${candidato.foto ? `<img src="\${candidato.foto}" class="w-10 h-10 rounded-full object-cover border border-emerald-500" />` : `<div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-xs">?</div>`}
+          <img src="${candidato.foto}" class="w-10 h-10 rounded-full object-cover border border-emerald-500 shadow" alt="${candidato.nome}" onerror="this.src='https://via.placeholder.com/40?text=Foto'" />
           <div class="overflow-hidden">
-            <div class="text-[10px] font-bold ${corTexto} uppercase">${tituloCargo}</div>
+            <div class="text-[10px] font-bold ${corTexto} uppercase tracking-tight">${tituloCargo}</div>
             <div class="font-extrabold text-white text-xs truncate">${candidato.nome}</div>
             <div class="text-[10px] text-emerald-400 font-semibold">${candidato.votos} voto(s)</div>
           </div>
